@@ -66,12 +66,14 @@ CREATE OR REPLACE TRIGGER update_trigger
 FOR UPDATE OF CODIGO, VALOR
 ON INDIVIDUO
 COMPOUND TRIGGER
-
+    diferencia INDIVIDUO.VALOR%TYPE;
+    codigo_padre INDIVIDUO.PADRE%TYPE := NULL;
+    aumento BOOLEAN := FALSE;
     old_codigo INDIVIDUO.CODIGO%TYPE := NULL;
     new_codigo INDIVIDUO.CODIGO%TYPE := NULL;
-    codigo_padre INDIVIDUO.PADRE%TYPE := NULL;
-    diferencia INDIVIDUO.VALOR%TYPE;
-    aumento BOOLEAN := FALSE;
+
+
+
     TYPE individuos_type IS TABLE OF INDIVIDUO%ROWTYPE
     INDEX BY BINARY_INTEGER;
     individuos_array individuos_type;
@@ -112,7 +114,7 @@ COMPOUND TRIGGER
                 IF individuos_array(i).CODIGO <> old_codigo AND individuos_array(i).PADRE = old_codigo THEN
                     individuos_array(i).PADRE := new_codigo;
                 ELSIF individuos_array(i).CODIGO = old_codigo THEN
-                    individuos_array(i).PADRE := codigo_padre;
+                    individuos_array(i).CODIGO := new_codigo;
                 END IF;
                 UPDATE INDIVIDUO SET PADRE = individuos_array(i).PADRE WHERE CODIGO = individuos_array(i).CODIGO;
             END LOOP;
